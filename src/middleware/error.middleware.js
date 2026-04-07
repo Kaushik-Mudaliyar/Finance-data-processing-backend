@@ -1,3 +1,4 @@
+import { apiResponse } from "../utils/apiResponse.js";
 export const errorHandler = (err, req, res, next) => {
   console.error(err);
 
@@ -5,7 +6,5 @@ export const errorHandler = (err, req, res, next) => {
 
   if (err.name === "CastError") statusCode = 400;
 
-  res.status(statusCode).json({
-    message: err.message || "Internal Server Error",
-  });
+  apiResponse(res, statusCode, err.message || "Internal Server Error");
 };
