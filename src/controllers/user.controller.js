@@ -65,7 +65,11 @@ async function updateUser(req, res) {
   return res.status(200).json({ message: "User updated successfully", user });
 }
 async function getAllUsers(req, res) {
-  const users = await userModel.find();
+  const { page = 1, limit = 10 } = req.query;
+  const users = await userModel
+    .find()
+    .skip(Number(page - 1) * limit)
+    .limit(Number(limit));
 
   return res
     .status(200)

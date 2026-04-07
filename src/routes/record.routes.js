@@ -9,31 +9,32 @@ import {
   authMiddleware,
   authorizeRoles,
 } from "../middleware/auth.middleware.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
 const router = Router();
 router.post(
   "/create-record",
   authMiddleware,
   authorizeRoles("admin"),
-  createRecord,
+  asyncHandler(createRecord),
 );
 router.get(
   "/",
   authMiddleware,
   authorizeRoles("admin", "analyst"),
-  getAllRecords,
+  asyncHandler(getAllRecords),
 );
 router.patch(
   "/update-record/:recordId",
   authMiddleware,
   authorizeRoles("admin"),
-  updateRecord,
+  asyncHandler(updateRecord),
 );
 router.delete(
   "/delete-record/:recordId",
   authMiddleware,
   authorizeRoles("admin"),
-  deleteRecord,
+  asyncHandler(deleteRecord),
 );
 
 export default router;

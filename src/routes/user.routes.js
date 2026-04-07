@@ -8,20 +8,25 @@ import {
   authMiddleware,
   authorizeRoles,
 } from "../middleware/auth.middleware.js";
-
+import asyncHandler from "../utils/asyncHandler.js";
 const router = Router();
 
 router.post(
   "/create-user",
   authMiddleware,
   authorizeRoles("admin"),
-  createUser,
+  asyncHandler(createUser),
 );
 router.patch(
   "/update-user/:userId",
   authMiddleware,
   authorizeRoles("admin"),
-  updateUser,
+  asyncHandler(updateUser),
 );
-router.get("/", authMiddleware, authorizeRoles("admin"), getAllUsers);
+router.get(
+  "/",
+  authMiddleware,
+  authorizeRoles("admin"),
+  asyncHandler(getAllUsers),
+);
 export default router;

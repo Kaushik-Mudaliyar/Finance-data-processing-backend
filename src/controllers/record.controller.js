@@ -30,7 +30,7 @@ async function createRecord(req, res) {
 }
 
 async function getAllRecords(req, res) {
-  const { type, category, date } = req.query;
+  const { type, category, date, page = 1, limit = 10 } = req.query;
 
   let filter = {};
 
@@ -45,12 +45,20 @@ async function getAllRecords(req, res) {
     filter.date = date;
   }
 
-  console.log(filter);
+  const records = await recordModel
+    .find({ ...filter })
+    .skip(Number((page - 1) * limit))
+    .limit(Number(limit));
 
-  const records = await recordModel.find({ ...filter });
-  return res
-    .status(200)
-    .json({ message: "Records fetched successfully", records });
+  const total = await recordModel.countDocuments();
+  return res.status(200).json({
+    message: "Records fetched successfully",
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    data: records,
+  });
 }
 
 async function updateRecord(req, res) {
