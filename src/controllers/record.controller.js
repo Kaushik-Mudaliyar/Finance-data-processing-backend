@@ -1,19 +1,19 @@
 import { recordModel } from "../models/record.model.js";
 import { isValidObjectId } from "mongoose";
+import { apiResponse } from "../utils/apiResponse.js";
 async function createRecord(req, res) {
   const { amount, type, category, date, notes } = req.body;
 
   if (!amount || !type || !category || !date) {
-    return res.status(400).json({
-      message:
-        "For creating a record amount, type, category, and date are required",
-    });
+    apiResponse(
+      res,
+      400,
+      "For creating a record amount, type, category and date are required",
+    );
   }
 
   if (type !== "income" && type !== "expense") {
-    return res
-      .status(400)
-      .json({ message: "Invalid type. Type will either income or expense" });
+    apiResponse(res, 400, "Invalid type, Type will either income or expense");
   }
 
   const record = await recordModel.create({
@@ -24,9 +24,7 @@ async function createRecord(req, res) {
     notes: notes || "",
   });
 
-  return res
-    .status(201)
-    .json({ message: "Record created successfully", record });
+  apiResponse(res, 201, "Record created successfully", record);
 }
 
 async function getAllRecords(req, res) {
@@ -51,13 +49,12 @@ async function getAllRecords(req, res) {
     .limit(Number(limit));
 
   const total = await recordModel.countDocuments();
-  return res.status(200).json({
-    message: "Records fetched successfully",
+  apiResponse(res, 200, "Records fetched successfully", {
     page,
     limit,
     total,
-    totalPages: Math.ceil(total / limit),
-    data: records,
+    totalPage: Math.ceil(total / limit),
+    records,
   });
 }
 
@@ -66,23 +63,22 @@ async function updateRecord(req, res) {
   const { recordId } = req.params;
 
   if (!amount && !type && !category && !date && !notes) {
-    return res.status(400).json({
-      message:
-        "Amount, type, category,date or notes are required for updating a record",
-    });
+    apiResponse(
+      res,
+      400,
+      "Amount, type, category, date or notes are required for updating a record",
+    );
   }
 
   if (!isValidObjectId(recordId)) {
-    return res.status(400).json({ message: "Invalid recordId" });
+    apiResponse(res, 400, "Invalid recordId");
   }
 
   let updateRecord = {};
 
   if (amount) {
     if (amount <= 0) {
-      return res
-        .status(400)
-        .json({ message: "Invalid Amount, Amount must be greater than 0" });
+      apiResponse(res, 400, "Invalid Amount, Amount must be greater than 0");
     }
 
     updateRecord.amount = amount;
@@ -90,9 +86,11 @@ async function updateRecord(req, res) {
 
   if (type) {
     if (type !== "income" && type !== "expense") {
-      return res.status(400).json({
-        message: "Invalid type, Type must be either income or expense",
-      });
+      apiResponse(
+        res,
+        400,
+        "Invalid type, Type must be either income or expense",
+      );
     }
     updateRecord.type = type;
   }
@@ -101,9 +99,7 @@ async function updateRecord(req, res) {
   }
   if (date) {
     if (typeof date !== "string") {
-      return res
-        .status(400)
-        .json({ message: "Invalid Date, Date should be string not a number" });
+      apiResponse(res, 400, "Invalid Date, Date should be string not a number");
     }
     updateRecord.date = date;
   }
@@ -121,22 +117,20 @@ async function updateRecord(req, res) {
   );
 
   if (!updateRecord) {
-    return res.status(404).json({ message: "Record does not exist" });
+    apiResponse(res, 404, "Record does not exist");
   }
 
-  return res
-    .status(200)
-    .json({ message: "Record updated successfully", updatedRecord });
+  apiResponse(res, 200, "Record updated successfully", updatedRecord);
 }
 async function deleteRecord(req, res) {
   const { recordId } = req.params;
 
   if (!isValidObjectId(recordId)) {
-    return res.status(400).json({ message: "Invalid recordId" });
+    apiResponse(res, 400, "Invalid recordId");
   }
   await recordModel.findByIdAndDelete({ _id: recordId });
 
-  return res.status(200).json({ message: "Record deleted successfully" });
+  apiResponse(res, 200, "Record deleted successfully");
 }
 
 export { createRecord, getAllRecords, updateRecord, deleteRecord };

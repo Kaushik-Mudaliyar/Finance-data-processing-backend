@@ -1,4 +1,5 @@
 import { recordModel } from "../models/record.model.js";
+import { apiResponse } from "../utils/apiResponse.js";
 async function getRecordDetails(req, res) {
   const overview = await recordModel.aggregate([
     {
@@ -80,8 +81,7 @@ async function getRecordDetails(req, res) {
     },
   ]);
 
-  return res.status(200).json({
-    message: "Dashboard fetched successfully",
+  apiResponse(res, 200, "Dashboard fetched successfully", {
     overview: overview[0],
     categories,
     recentActivity,

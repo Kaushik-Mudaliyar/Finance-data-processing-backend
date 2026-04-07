@@ -1,20 +1,19 @@
 import { userModel } from "../models/user.model.js";
 import { isValidObjectId } from "mongoose";
+import { apiResponse } from "../utils/apiResponse.js";
 async function createUser(req, res) {
   const { username, email, role, status } = req.body;
 
   // check if name or email is not coming
   if (!username || !email) {
-    return res
-      .status(400)
-      .json({ message: "Creating a user, name and email is required!" });
+    apiResponse(res, 400, "Creating a user, name and email is required!");
   }
 
   // check if user already exists
   const isUserAlreadyExists = await userModel.findOne({ email: email });
 
   if (isUserAlreadyExists) {
-    return res.status(400).json({ message: "User already exists" });
+    apiResponse(res, 400, "User already exists");
   }
 
   const user = await userModel.create({
@@ -24,7 +23,7 @@ async function createUser(req, res) {
     status,
   });
 
-  return res.status(201).json({ message: "User created successfully", user });
+  apiResponse(res, 201, "User created successfully", user);
 }
 async function updateUser(req, res) {
   const { role, status } = req.body;
@@ -35,34 +34,36 @@ async function updateUser(req, res) {
   }
 
   if (!role && !status) {
-    return res
-      .status(400)
-      .json({ message: "Role or status is required for updating the user" });
+    apiResponse(res, 400, "Role or status is required for updating the user");
   }
 
   const user = await userModel.findById(userId);
   if (!user) {
-    return res.status(404).json({ message: "User does not exist" });
+    apiResponse(res, 404, "User does not exist");
   }
 
   if (role) {
     if (role !== "admin" && role !== "viewer" && role !== "analyst") {
-      return res.status(400).json({
-        message: "Invalid Role. Role must be either admin,viewer or analyst",
-      });
+      apiResponse(
+        res,
+        400,
+        "Invalid Role. Role must be either admin,viewer or analyst",
+      );
     }
     user.role = role;
   }
   if (status) {
     if (status !== "ACTIVE" && status !== "INACTIVE") {
-      return res.status(400).json({
-        message: "Invalid Status. Status must be either ACTIVE or INACTIVE",
-      });
+      apiResponse(
+        res,
+        400,
+        "Invalid Status, Status must be either ACTIVE or INACTIVE",
+      );
     }
     user.status = status;
   }
   await user.save();
-  return res.status(200).json({ message: "User updated successfully", user });
+  apiResponse(res, 200, "User updated successfully", user);
 }
 async function getAllUsers(req, res) {
   const { page = 1, limit = 10 } = req.query;
@@ -71,9 +72,7 @@ async function getAllUsers(req, res) {
     .skip(Number(page - 1) * limit)
     .limit(Number(limit));
 
-  return res
-    .status(200)
-    .json({ message: "All Users fetched successfully", users });
+  apiResponse(res, 200, "All Users fetched successfully", users);
 }
 
 export { createUser, updateUser, getAllUsers };
