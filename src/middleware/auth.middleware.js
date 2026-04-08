@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { apiResponse } from "../utils/apiResponse.js";
+import { userModel } from "../models/user.model.js";
 async function authMiddleware(req, res, next) {
   try {
     // 1. Get token from headers or cookies

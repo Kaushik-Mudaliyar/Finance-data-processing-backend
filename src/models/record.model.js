@@ -31,5 +31,8 @@ const recordSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+recordSchema.index({ date: -1 });
+recordSchema.index({ type: 1 });
+recordSchema.index({ category: 1 });
 
 export const recordModel = mongoose.model("Record", recordSchema);
